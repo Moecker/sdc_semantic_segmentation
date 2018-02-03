@@ -55,7 +55,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     """
     # Note: num_classes is binar: road vs. no-road
     # 1by1 convolution
-    conv_1by1 = tf.layers.conv2d(vgg_layer7_out, num_classes, kernel_size=1, padding='same',
+    conv_1by1 = tf.layers.conv2d(vgg_layer7_out, num_classes, kernel_size=1, strides=(1, 1), padding='same',
                                  kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # First transposed convolution for upscaling
@@ -63,13 +63,15 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
                                               kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # First skip layer and further transposed convolution for upscaling
-    skip_1 = tf.add(conv_trans_1, vgg_layer4_out)
-    conv_trans_2 = tf.layers.conv2d_transpose(skip_1, num_classes, kernel_size=4, strides=(2, 2, padding='same',
+    # skip_1 = tf.add(conv_trans_1, vgg_layer4_out)
+    skip_1 = conv_trans_1
+    conv_trans_2 = tf.layers.conv2d_transpose(skip_1, num_classes, kernel_size=4, strides=(2, 2), padding='same',
                                               kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # Second skip layer and further transposed convolution for upscaling
-    skip_2 = tf.add(conv_trans_2, vgg_layer3_out)
-    output = tf.layers.conv2d_transpose(skip_2, num_classes, kernel_size=16, strides=(8, 8, padding='same',
+    # skip_2 = tf.add(conv_trans_2, vgg_layer3_out)
+    skip_2 = conv_trans_2
+    output = tf.layers.conv2d_transpose(skip_2, num_classes, kernel_size=16, strides=(8, 8), padding='same',
                                         kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     return output
@@ -85,9 +87,12 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     :param num_classes: Number of classes to classify
     :return: Tuple of (logits, train_op, cross_entropy_loss)
     """
-    # TODO: Implement function
-    return None, None, None
-# tests.test_optimize(optimize)
+    logits = tf.reshape(nn_last_layer, (-1, num_classes))
+    cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=logits, labels=correct_label))
+    train_op = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss)
+
+    return logits, train_op, cross_entropy_loss
+tests.test_optimize(optimize)
 
 
 def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
@@ -105,9 +110,11 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
     """
-    # TODO: Implement function
+    for epoch in range(epochs):
+        for image, label in get_batches_fn(batch_size):
+            pass
     pass
-# tests.test_train_nn(train_nn)
+tests.test_train_nn(train_nn)
 
 
 def run():
@@ -134,6 +141,11 @@ def run():
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
         # TODO: Build NN using load_vgg, layers, and optimize function
+        input_image, keep_prob, layer3_out, layer4_out, layer7_out = load_vgg(sess, vgg_path)
+        layer_output = layers(layer3_out, layer4_out, layer7_out, num_classes)
+
+        correct_label = tf.placeholder("float", None)
+        logits, train_op, cross_entropy_loss = optimize(layer_output, correct_label, learning_rate = 1e-3, num_classes = num_classes)
 
         # TODO: Train NN using the train_nn function
 
