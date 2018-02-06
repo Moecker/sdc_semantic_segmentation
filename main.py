@@ -58,37 +58,37 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     # Note: num_classes is binar: road vs. no-road
     # 1by1 convolution
     conv_1by1 = tf.layers.conv2d(vgg_layer7_out, num_classes, kernel_size=1, padding='same',
-    kernel_initializer= tf.random_normal_initializer(stddev=0.01),
-    kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+                                 kernel_initializer= tf.random_normal_initializer(stddev=0.01),
+                                 kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # First transposed convolution for upscaling
     conv_trans_1 = tf.layers.conv2d_transpose(conv_1by1, num_classes, kernel_size=4, strides=(2, 2), padding='same',
-    kernel_initializer= tf.random_normal_initializer(stddev=0.01),
-    kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+                                              kernel_initializer= tf.random_normal_initializer(stddev=0.01),
+                                              kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # 1by1 convolution vgg_layer4_out
     conv_1by1_vgg4 = tf.layers.conv2d(vgg_layer4_out, num_classes, kernel_size=1, padding= 'same',
-    kernel_initializer= tf.random_normal_initializer(stddev=0.01),
-    kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+                                      kernel_initializer= tf.random_normal_initializer(stddev=0.01),
+                                      kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # First skip layer and further transposed convolution for upscaling
     skip_1 = tf.add(conv_trans_1, conv_1by1_vgg4)
     conv_trans_2 = tf.layers.conv2d_transpose(skip_1, num_classes, kernel_size=4, strides=(2, 2), padding='same',
-    kernel_initializer= tf.random_normal_initializer(stddev=0.01),
-    kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+                                              kernel_initializer= tf.random_normal_initializer(stddev=0.01),
+                                              kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # 1by1 convolution vgg_layer3_out
     conv_1by1_vgg3 = tf.layers.conv2d(vgg_layer3_out, num_classes, kernel_size=1, padding= 'same',
-    kernel_initializer= tf.random_normal_initializer(stddev=0.01),
-    kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+                                      kernel_initializer= tf.random_normal_initializer(stddev=0.01),
+                                      kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # Second skip layer and further transposed convolution for upscaling
     skip_2 = tf.add(conv_trans_2, conv_1by1_vgg3)
     output = tf.layers.conv2d_transpose(skip_2, num_classes, kernel_size=16, strides=(8, 8), padding='same',
-    kernel_initializer= tf.random_normal_initializer(stddev=0.01),
-    kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+                                        kernel_initializer= tf.random_normal_initializer(stddev=0.01),
+                                        kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     print("Layers created")
-    
+
     return output
 
 
@@ -107,8 +107,8 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
 
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=correct_label))
     train_op = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss)
-
     print("Optimizer setup")
+
     return logits, train_op, cross_entropy_loss
 
 
@@ -135,10 +135,10 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
         for image, label in get_batches_fn(batch_size):
             batch += 1
             _, loss = sess.run([train_op, cross_entropy_loss],
-            feed_dict={input_image: image,
-            correct_label: label,
-            keep_prob: 0.5,
-            learning_rate: 1e-3})
+                                feed_dict = {input_image: image,
+                                             correct_label: label,
+                                             keep_prob: 0.5,
+                                             learning_rate: 1e-3})
 
             epoch_loss += loss
             print("Batch {} - Current loss: {:.3f}".format(batch, loss))
@@ -148,6 +148,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
 
 
 def run():
+    print("Run")
     num_classes = 2
     image_shape = (160, 576)
     data_dir = './data'
@@ -190,11 +191,31 @@ def run():
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
 
         # OPTIONAL: Apply the trained model to a video
+        
+ 
+def process_image(image, frame_name=""):
+    return image
 
+
+def run_video(camera):
+    print("Run Video")
+
+    from moviepy.editor import VideoFileClip
+
+    file = "videos/project_video"
+    
+    clip = VideoFileClip("./" + file + ".mp4")
+    output_video = "./" + file + "_processed.mp4"
+
+    # output_clip = clip.fl_image(process_image)
+    output_clip = clip.subclip(1, 2).fl_image(process_image)
+
+    output_clip.write_videofile(output_video, audio=False)
+        
 
 if __name__ == '__main__':
     tests.test_load_vgg(load_vgg, tf)
     tests.test_layers(layers)
     tests.test_optimize(optimize)
     tests.test_train_nn(train_nn)
-    run()
+    run()s
