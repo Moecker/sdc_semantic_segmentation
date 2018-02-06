@@ -4,6 +4,7 @@ import helper
 import warnings
 from distutils.version import LooseVersion
 import project_tests as tests
+import scipy    
 
 
 # Check TensorFlow Version
@@ -154,7 +155,7 @@ def run():
     data_dir = './data'
     runs_dir = './runs'
 
-    # tests.test_for_kitti_dataset(data_dir)
+    tests.test_for_kitti_dataset(data_dir)
 
     # Download pretrained vgg model
     helper.maybe_download_pretrained_vgg(data_dir)
@@ -164,7 +165,7 @@ def run():
     #  https://www.cityscapes-dataset.com/
     
     kBatchSize = 5
-    kEpochs = 1
+    kEpochs = 10
 
     with tf.Session() as sess:
         # Path to vgg model
@@ -196,6 +197,7 @@ def run():
         print("Model saved in path: %s" % save_path)
 
         # OPTIONAL: Apply the trained model to a video
+        For this, run the run_video method
 
         
 # Global sessio object for video processing
@@ -207,7 +209,10 @@ g_input_image = None
 def process_video_image(image, frame_name=""):
     image_shape = (160, 576)
     processed_image = helper.get_inference_samples_video(image, g_session, image_shape, g_logits, g_keep_prob, g_input_image)
-    return processed_image
+    
+    image_shape_orig = (360, 640)
+    small = scipy.misc.imresize(processed_image, image_shape_orig)
+    return small
 
 
 def run_video():
@@ -244,7 +249,7 @@ def run_video():
         print("Model restored.")
 
         # output_clip = clip.fl_image(process_image)
-        output_clip = clip.subclip(1, 2).fl_image(process_video_image)
+        output_clip = clip.subclip(0, 0.5).fl_image(process_video_image)
         output_clip.write_videofile(output_video, audio=False)
         
 
@@ -253,4 +258,5 @@ if __name__ == '__main__':
     tests.test_layers(layers)
     tests.test_optimize(optimize)
     tests.test_train_nn(train_nn)
+    run()
     run_video()

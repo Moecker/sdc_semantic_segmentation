@@ -153,7 +153,7 @@ def get_single_image_output(sess, logits, keep_prob, image_pl, image_video, imag
     street_im = scipy.misc.toimage(image)
     street_im.paste(mask, box=None, mask=mask)
 
-    return street_im
+    return np.array(street_im)
 
 
 def get_inference_samples_video(image_video, sess, image_shape, logits, keep_prob, input_image):
