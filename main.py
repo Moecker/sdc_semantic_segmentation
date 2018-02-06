@@ -197,7 +197,7 @@ def run():
         print("Model saved in path: %s" % save_path)
 
         # OPTIONAL: Apply the trained model to a video
-        For this, run the run_video method
+        # For this, run the run_video method
 
         
 # Global sessio object for video processing
