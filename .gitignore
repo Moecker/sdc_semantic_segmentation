@@ -101,3 +101,8 @@ ENV/
 .mypy_cache/
 
 RUNS/
+/model/checkpoint
+/model/semantic_segmentation_model.ckpt.data-00000-of-00001
+/model/semantic_segmentation_model.ckpt.index
+/model/semantic_segmentation_model.ckpt.meta
+/videos/project_video.mp4

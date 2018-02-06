@@ -154,7 +154,7 @@ def run():
     data_dir = './data'
     runs_dir = './runs'
 
-    tests.test_for_kitti_dataset(data_dir)
+    # tests.test_for_kitti_dataset(data_dir)
 
     # Download pretrained vgg model
     helper.maybe_download_pretrained_vgg(data_dir)
@@ -162,9 +162,9 @@ def run():
     # OPTIONAL: Train and Inference on the cityscapes dataset instead of the Kitti dataset.
     # You'll need a GPU with at least 10 teraFLOPS to train on.
     #  https://www.cityscapes-dataset.com/
-
+    
     kBatchSize = 5
-    kEpochs = 10
+    kEpochs = 1
 
     with tf.Session() as sess:
         # Path to vgg model
@@ -184,20 +184,29 @@ def run():
         logits, train_op, cross_entropy_loss = optimize(layer_output, correct_label, learning_rate, num_classes)
 
         # Train NN using the train_nn function
-        train_nn(sess, kEpochs, kBatchSize, get_batches_fn, train_op, cross_entropy_loss, input_image,
-        correct_label, keep_prob, learning_rate)
+        train_nn(sess, kEpochs, kBatchSize, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
 
         # Save inference data using helper.save_inference_samples
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+        
+        # Save the variables to disk.
+        print("Saving model...")
+        saver = tf.train.Saver()
+        save_path = saver.save(sess, "./model/semantic_segmentation_model.ckpt")
+        print("Model saved in path: %s" % save_path)
 
         # OPTIONAL: Apply the trained model to a video
+
         
+# Global sessio object for video processing
+g_session = None
  
-def process_image(image, frame_name=""):
-    return image
+def process_video_image(image, frame_name=""):
+    processed_image = helper.get_inference_samples_video(image, sess, image_shape, logits, keep_prob, input_image)
+    return processed_image
 
 
-def run_video(camera):
+def run_video():
     print("Run Video")
 
     from moviepy.editor import VideoFileClip
@@ -206,11 +215,28 @@ def run_video(camera):
     
     clip = VideoFileClip("./" + file + ".mp4")
     output_video = "./" + file + "_processed.mp4"
+    
+    num_classes = 2
+    image_shape = (160, 576)
 
-    # output_clip = clip.fl_image(process_image)
-    output_clip = clip.subclip(1, 2).fl_image(process_image)
+    global g_session
+    with tf.Session() as g_session:
+        vgg_path = os.path.join(data_dir, 'vgg')
 
-    output_clip.write_videofile(output_video, audio=False)
+        correct_label = tf.placeholder(tf.int32, [None, None, None, num_classes], name='correct_label')
+        learning_rate = tf.placeholder(tf.float32, name='learning_rate')
+
+        input_image, keep_prob, layer3_out, layer4_out, layer7_out = load_vgg(g_session, vgg_path)
+        layer_output = layers(layer3_out, layer4_out, layer7_out, num_classes)
+        logits, train_op, cross_entropy_loss = optimize(layer_output, correct_label, learning_rate, num_classes)
+        
+        saver = tf.train.Saver()
+        saver.restore(g_session, "./model/semantic_segmentation_model.ckpt")
+        print("Model restored.")
+
+        # output_clip = clip.fl_image(process_image)
+        output_clip = clip.subclip(1, 2).fl_image(process_video_image)
+        output_clip.write_videofile(output_video, audio=False)
         
 
 if __name__ == '__main__':
@@ -218,4 +244,4 @@ if __name__ == '__main__':
     tests.test_layers(layers)
     tests.test_optimize(optimize)
     tests.test_train_nn(train_nn)
-    run()s
+    run_video()
