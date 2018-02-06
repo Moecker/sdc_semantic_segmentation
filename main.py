@@ -200,9 +200,13 @@ def run():
         
 # Global sessio object for video processing
 g_session = None
+g_logits = None
+g_keep_prob = None
+g_input_image = None
  
 def process_video_image(image, frame_name=""):
-    processed_image = helper.get_inference_samples_video(image, sess, image_shape, logits, keep_prob, input_image)
+    image_shape = (160, 576)
+    processed_image = helper.get_inference_samples_video(image, g_session, image_shape, g_logits, g_keep_prob, g_input_image)
     return processed_image
 
 
@@ -216,20 +220,25 @@ def run_video():
     clip = VideoFileClip("./" + file + ".mp4")
     output_video = "./" + file + "_processed.mp4"
     
+    data_dir = './data'
     num_classes = 2
-    image_shape = (160, 576)
 
     global g_session
+    global g_logits
+    global g_keep_prob
+    global g_input_image
+    
     with tf.Session() as g_session:
         vgg_path = os.path.join(data_dir, 'vgg')
 
         correct_label = tf.placeholder(tf.int32, [None, None, None, num_classes], name='correct_label')
         learning_rate = tf.placeholder(tf.float32, name='learning_rate')
 
-        input_image, keep_prob, layer3_out, layer4_out, layer7_out = load_vgg(g_session, vgg_path)
+        g_input_image, g_keep_prob, layer3_out, layer4_out, layer7_out = load_vgg(g_session, vgg_path)
         layer_output = layers(layer3_out, layer4_out, layer7_out, num_classes)
-        logits, train_op, cross_entropy_loss = optimize(layer_output, correct_label, learning_rate, num_classes)
+        g_logits, train_op, cross_entropy_loss = optimize(layer_output, correct_label, learning_rate, num_classes)
         
+        print("Restoring model...")
         saver = tf.train.Saver()
         saver.restore(g_session, "./model/semantic_segmentation_model.ckpt")
         print("Model restored.")
