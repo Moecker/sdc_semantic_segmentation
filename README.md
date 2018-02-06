@@ -2,6 +2,21 @@
 ### Introduction
 In this project, you'll label the pixels of a road in images using a Fully Convolutional Network (FCN).
 
+### Rubric
+The following rubric point have been achieved
+
+##### Build the Neural Network
+* Does the project load the pretrained vgg model?
+* Does the project learn the correct features from the images?
+* Does the project optimize the neural network?
+* Does the project train the neural network?
+
+##### Neural Network Training
+* Does the project train the model correctly?
+* Does the project use reasonable hyperparameters?
+* Does the project correctly label the road?
+* The project labels most pixels of roads close to the best solution. The model doesn't have to predict correctly all the images, just most of them.
+
 ### Setup
 ##### Frameworks and Packages
 Make sure you have the following is installed:
