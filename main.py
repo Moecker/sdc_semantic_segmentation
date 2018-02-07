@@ -163,6 +163,7 @@ def run():
     # OPTIONAL: Train and Inference on the cityscapes dataset instead of the Kitti dataset.
     # You'll need a GPU with at least 10 teraFLOPS to train on.
     #  https://www.cityscapes-dataset.com/
+    # Note: Not done
     
     kBatchSize = 5
     kEpochs = 10
@@ -175,6 +176,7 @@ def run():
 
         # OPTIONAL: Augment Images for better results
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
+        # Note: Not implemented.
 
         correct_label = tf.placeholder(tf.int32, [None, None, None, num_classes], name='correct_label')
         learning_rate = tf.placeholder(tf.float32, name='learning_rate')
@@ -183,7 +185,7 @@ def run():
         input_image, keep_prob, layer3_out, layer4_out, layer7_out = load_vgg(sess, vgg_path)
         layer_output = layers(layer3_out, layer4_out, layer7_out, num_classes)
         logits, train_op, cross_entropy_loss = optimize(layer_output, correct_label, learning_rate, num_classes)
-
+        
         # Train NN using the train_nn function
         train_nn(sess, kEpochs, kBatchSize, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
 
@@ -197,7 +199,7 @@ def run():
         print("Model saved in path: %s" % save_path)
 
         # OPTIONAL: Apply the trained model to a video
-        # For this, run the run_video method
+        # Note: For this, run the run_video method from main.
 
         
 # Global sessio object for video processing
@@ -220,7 +222,7 @@ def run_video():
 
     from moviepy.editor import VideoFileClip
 
-    file = "videos/project_video"
+    file = "videos/challenge_video"
     
     clip = VideoFileClip("./" + file + ".mp4")
     output_video = "./" + file + "_processed.mp4"
@@ -248,8 +250,8 @@ def run_video():
         saver.restore(g_session, "./model/semantic_segmentation_model.ckpt")
         print("Model restored.")
 
-        # output_clip = clip.fl_image(process_image)
-        output_clip = clip.subclip(0, 0.5).fl_image(process_video_image)
+        output_clip = clip.fl_image(process_video_image)
+        # output_clip = clip.subclip(0, 1).fl_image(process_video_image)
         output_clip.write_videofile(output_video, audio=False)
         
 
@@ -258,5 +260,7 @@ if __name__ == '__main__':
     tests.test_layers(layers)
     tests.test_optimize(optimize)
     tests.test_train_nn(train_nn)
-    run()
+    
+    # Either call "run()" for training the CNN and saving the network or "run_video" to apply
+    # the trained network onto a video.
     run_video()

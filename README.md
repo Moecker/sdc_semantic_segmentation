@@ -17,6 +17,14 @@ The following rubric point have been achieved
 * Does the project correctly label the road?
 * The project labels most pixels of roads close to the best solution. The model doesn't have to predict correctly all the images, just most of them.
 
+## Results
+The following images shows results of the semantic segmentation project using one class (drivable road).
+![Image](media/um_000013.png)
+![Image](media/um_000061.png)
+
+This video shows an application where semantic segmentation has been applied.
+[![Video](https://img.youtube.com/vi/4ch2nu9xfBA/0.jpg)](https://www.youtube.com/watch?v=4ch2nu9xfBA)
+
 ### Setup
 ##### Frameworks and Packages
 Make sure you have the following is installed:

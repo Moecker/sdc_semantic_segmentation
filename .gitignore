@@ -107,3 +107,7 @@ RUNS/
 /model/semantic_segmentation_model.ckpt.meta
 /videos/project_video.mp4
 /videos/project_video_processed.mp4
+/videos/harder_challenge_video_processed.mp4
+/videos/challenge_video.mp4
+/videos/harder_challenge_video.mp4
+/videos/challenge_video_processed.mp4
