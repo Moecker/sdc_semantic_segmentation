@@ -263,4 +263,5 @@ if __name__ == '__main__':
     
     # Either call "run()" for training the CNN and saving the network or "run_video" to apply
     # the trained network onto a video.
-    run_video()
+    # For video: run_video()
+    run()
