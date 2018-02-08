@@ -32,6 +32,9 @@ The following videos show an application where semantic segmentation has been ap
 [![Video](https://img.youtube.com/vi/4ch2nu9xfBA/0.jpg)](https://www.youtube.com/watch?v=4ch2nu9xfBA)
 [![Video](https://img.youtube.com/vi/eL7jueT-OOM/0.jpg)](https://www.youtube.com/watch?v=eL7jueT-OOM)
 
+### All Images
+The entire set of classified images can be found in the ./result folder.
+
 ### Setup
 ##### Frameworks and Packages
 Make sure you have the following is installed:
