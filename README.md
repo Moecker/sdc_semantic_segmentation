@@ -1,6 +1,7 @@
 # Semantic Segmentation
 ### Introduction
-In this project, you'll label the pixels of a road in images using a Fully Convolutional Network (FCN).
+In this project, the label of each pixel of a road in images using a Fully Convolutional Network (FCN) has been segmented.
+The network is trained on a the Kitti dataset containing roughly 300 images with given ground truth.
 
 ### Rubric
 The following rubric point have been achieved
@@ -27,8 +28,9 @@ The following images shows results of the semantic segmentation project using on
 ![Image](media/uu_000094.png)       
 
 ### Videos
-This video shows an application where semantic segmentation has been applied.
+The following videos show an application where semantic segmentation has been applied.
 [![Video](https://img.youtube.com/vi/4ch2nu9xfBA/0.jpg)](https://www.youtube.com/watch?v=4ch2nu9xfBA)
+[![Video](https://img.youtube.com/vi/eL7jueT-OOM/0.jpg)](https://www.youtube.com/watch?v=eL7jueT-OOM)
 
 ### Setup
 ##### Frameworks and Packages
